@@ -1,0 +1,13 @@
+User-agent: *
+Disallow: /
+Disallow: /signin
+Disallow: /signup
+
+Allow: /chat/
+Allow: /api/
+
+# Sitemap location
+Sitemap: https://virallens.com/sitemaps.html
+
+# Crawl delay (optional - be respectful to search engines)
+Crawl-delay: 1
