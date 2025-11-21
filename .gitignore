@@ -5,13 +5,14 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+**/package-lock.json
+
 # Environment files
 .env
 .env.development
 .env.local
 .env.production
 .env.test
-.env.example
 
 # ----- TypeScript -----
 *.tsbuildinfo

@@ -1,11 +1,12 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import connectDB from './config/database';
-import authRoutes from './routes/auth';
-import chatRoutes from './routes/chat';
-import { errorHandler } from './middleware/errorHandler';
-import { generalLimiter } from './middleware/rateLimiter';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import connectDB from "./config/database";
+import authRoutes from "./routes/auth";
+import chatRoutes from "./routes/chat";
+import { errorHandler } from "./middleware/errorHandler";
+import { generalLimiter } from "./middleware/rateLimiter";
 
 dotenv.config();
 
@@ -14,20 +15,36 @@ const PORT = process.env.PORT;
 
 connectDB();
 
-app.use(cors({
-    origin: ['http://www.google.com'],
-}));
+console.log("Frontend URL: ", process.env.FRONTEND_URL);
 
-app.use('/api/', generalLimiter);
+app.set("trust proxy", 1);
+
+app.use(
+    cors({
+        origin: process.env.FRONTEND_URL,
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
+);
+
+app.options("*", cors());
+
+app.use(cookieParser());
+
+app.use("/api/", generalLimiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/auth-routes', authRoutes);
-app.use('/api/chat-routes', chatRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/chat", chatRoutes);
 
-app.get('/', (req, res) => {
-    res.json({ message: 'Server is running!', timestamp: new Date().toISOString() });
+app.get("/", (req, res) => {
+    res.json({
+        message: "Server is running!",
+        timestamp: new Date().toISOString(),
+    });
 });
 
 app.use(errorHandler);
