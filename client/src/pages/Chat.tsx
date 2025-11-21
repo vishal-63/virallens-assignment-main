@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { chatApi } from '../utils/chatApi';
-import { Conversation, Message } from '../types/chat';
-import LoadingSpinner from '../components/LoadingSpinner';
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import { chatApi } from "../utils/chatApi";
+import { Conversation, Message } from "../types/chat";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Chat = () => {
     const { conversationId } = useParams<{ conversationId: string }>();
@@ -10,10 +13,13 @@ const Chat = () => {
     const [conversation, setConversation] = useState<Conversation | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isStreaming, setIsStreaming] = useState(false);
-    const [streamingMessage, setStreamingMessage] = useState('');
-    const [message, setMessage] = useState('');
+    const [streamingMessage, setStreamingMessage] = useState("");
+    const [message, setMessage] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const user = localStorage.getItem("user");
+    console.log(user);
 
     useEffect(() => {
         if (conversationId) {
@@ -26,7 +32,7 @@ const Chat = () => {
     }, [conversation?.messages, streamingMessage]);
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     const loadConversation = async () => {
@@ -35,12 +41,12 @@ const Chat = () => {
         try {
             setIsLoading(true);
             // Its intentional so don't count it as a bug
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise((resolve) => setTimeout(resolve, 5000));
             const data = await chatApi.getConversation(conversationId);
             setConversation(data);
         } catch (error) {
-            console.error('Error loading conversation:', error);
-            navigate('/chat');
+            console.error("Error loading conversation:", error);
+            navigate("/chat");
         } finally {
             setIsLoading(false);
         }
@@ -51,27 +57,34 @@ const Chat = () => {
         if (!message.trim() || !conversationId || isStreaming) return;
 
         const userMessage = message.trim();
-        setMessage('');
+        setMessage("");
         setIsStreaming(true);
-        setStreamingMessage('');
+        setStreamingMessage("");
 
         const newUserMessage: Message = {
-            role: 'user',
+            role: "user",
             content: userMessage,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         };
 
-        setConversation(prev => prev ? {
-            ...prev,
-            messages: [...prev.messages, newUserMessage]
-        } : null);
+        setConversation((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      messages: [...prev.messages, newUserMessage],
+                  }
+                : null
+        );
 
         try {
-            const stream = await chatApi.sendMessage(conversationId, userMessage);
+            const stream = await chatApi.sendMessage(
+                conversationId,
+                userMessage
+            );
             const reader = stream.getReader();
             const decoder = new TextDecoder();
 
-            let fullResponse = '';
+            let fullResponse = "";
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -84,28 +97,31 @@ const Chat = () => {
             }
 
             const aiMessage: Message = {
-                role: 'assistant',
+                role: "assistant",
                 content: fullResponse,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
             };
 
-            setConversation(prev => prev ? {
-                ...prev,
-                messages: [...prev.messages, aiMessage],
-                lastMessageAt: new Date().toISOString()
-            } : null);
+            setConversation((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          messages: [...prev.messages, aiMessage],
+                          lastMessageAt: new Date().toISOString(),
+                      }
+                    : null
+            );
 
-            setStreamingMessage('');
-
+            setStreamingMessage("");
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error("Error sending message:", error);
         } finally {
             setIsStreaming(false);
         }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage(e);
         }
@@ -114,15 +130,15 @@ const Chat = () => {
     const adjustTextareaHeight = () => {
         const textarea = textareaRef.current;
         if (textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+            textarea.style.height = "auto";
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
         }
     };
 
     const formatTimestamp = (timestamp: string) => {
         return new Date(timestamp).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
+            hour: "2-digit",
+            minute: "2-digit",
         });
     };
 
@@ -139,8 +155,13 @@ const Chat = () => {
             <div className="flex items-center justify-center h-full bg-gray-50">
                 <div className="text-center">
                     <div className="text-gray-400 text-6xl mb-4">⚠️</div>
-                    <div className="text-gray-600 text-lg font-medium">Conversation not found</div>
-                    <p className="text-gray-500 text-sm mt-2">This conversation may have been deleted or doesn't exist.</p>
+                    <div className="text-gray-600 text-lg font-medium">
+                        Conversation not found
+                    </div>
+                    <p className="text-gray-500 text-sm mt-2">
+                        This conversation may have been deleted or doesn't
+                        exist.
+                    </p>
                 </div>
             </div>
         );
@@ -148,8 +169,6 @@ const Chat = () => {
 
     return (
         <div className="flex flex-col h-full bg-gray-50">
-
-
             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
                 {conversation.messages.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
@@ -157,33 +176,64 @@ const Chat = () => {
                             <div className="w-20 h-20 mx-auto mb-6 bg-gray-200 rounded-full flex items-center justify-center">
                                 <span className="text-3xl">💬</span>
                             </div>
-                            <h3 className="text-xl font-semibold text-gray-800 mb-2">Start the conversation</h3>
-                            <p className="text-gray-600">Send a message to begin chatting with the marketing assistant.</p>
+                            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                                Start the conversation
+                            </h3>
+                            <p className="text-gray-600">
+                                Send a message to begin chatting with the
+                                marketing assistant.
+                            </p>
                         </div>
                     </div>
                 ) : (
                     conversation.messages.map((msg, index) => (
                         <div
                             key={index}
-                            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            className={`flex ${
+                                msg.role === "user"
+                                    ? "justify-end"
+                                    : "justify-start"
+                            }`}
                         >
-                            <div className={`flex ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start space-x-3 max-w-[80%]`}>
-                                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${msg.role === 'user'
-                                    ? 'bg-gray-800 text-white ml-3'
-                                    : 'bg-gray-300 text-gray-700 mr-3'
-                                    }`}>
-                                    {msg.role === 'user' ? 'U' : 'AI'}
+                            <div
+                                className={`flex ${
+                                    msg.role === "user"
+                                        ? "flex-row-reverse"
+                                        : "flex-row"
+                                } items-start space-x-3 max-w-[80%]`}
+                            >
+                                <div
+                                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                                        msg.role === "user"
+                                            ? "bg-gray-800 text-white ml-3"
+                                            : "bg-gray-300 text-gray-700 mr-3"
+                                    }`}
+                                >
+                                    {msg.role === "user" ? "U" : "AI"}
                                 </div>
 
-                                <div className={`rounded-2xl px-4 py-3 shadow-sm ${msg.role === 'user'
-                                    ? 'bg-gray-800 text-white rounded-br-md'
-                                    : 'bg-white text-gray-900 border border-gray-200 rounded-bl-md'
-                                    }`}>
+                                <div
+                                    className={`rounded-2xl px-4 py-3 shadow-sm ${
+                                        msg.role === "user"
+                                            ? "bg-gray-800 text-white rounded-br-md"
+                                            : "bg-white text-gray-900 border border-gray-200 rounded-bl-md"
+                                    }`}
+                                >
                                     <div className="whitespace-pre-wrap break-words text-sm leading-relaxed">
-                                        {msg.content}
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            rehypePlugins={[rehypeHighlight]}
+                                        >
+                                            {msg.content}
+                                        </ReactMarkdown>
                                     </div>
-                                    <div className={`text-xs mt-2 ${msg.role === 'user' ? 'text-gray-300' : 'text-gray-500'
-                                        }`}>
+                                    <div
+                                        className={`text-xs mt-2 ${
+                                            msg.role === "user"
+                                                ? "text-gray-300"
+                                                : "text-gray-500"
+                                        }`}
+                                    >
                                         {formatTimestamp(msg.timestamp)}
                                     </div>
                                 </div>
@@ -217,8 +267,14 @@ const Chat = () => {
                             <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
                                 <div className="flex items-center space-x-1">
                                     <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                    <div
+                                        className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
+                                        style={{ animationDelay: "0.1s" }}
+                                    ></div>
+                                    <div
+                                        className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
+                                        style={{ animationDelay: "0.2s" }}
+                                    ></div>
                                 </div>
                             </div>
                         </div>
@@ -229,7 +285,10 @@ const Chat = () => {
             </div>
 
             <div className="border-t border-gray-200 bg-white px-6 py-4 shadow-lg">
-                <form onSubmit={handleSendMessage} className="flex items-end space-x-3">
+                <form
+                    onSubmit={handleSendMessage}
+                    className="flex items-end space-x-3"
+                >
                     <textarea
                         ref={textareaRef}
                         value={message}
