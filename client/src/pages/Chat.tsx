@@ -6,6 +6,7 @@ import rehypeHighlight from "rehype-highlight";
 import { chatApi } from "../utils/chatApi";
 import { Conversation, Message } from "../types/chat";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { User } from "@/types/auth";
 
 const Chat = () => {
     const { conversationId } = useParams<{ conversationId: string }>();
@@ -17,9 +18,14 @@ const Chat = () => {
     const [message, setMessage] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [user, setUser] = useState<User | null>(null);
 
-    const user = localStorage.getItem("user");
-    console.log(user);
+    useEffect(() => {
+        const userString = localStorage.getItem("user");
+        if (userString) {
+            setUser(JSON.parse(userString));
+        }
+    }, []);
 
     useEffect(() => {
         if (conversationId) {
@@ -209,7 +215,11 @@ const Chat = () => {
                                             : "bg-gray-300 text-gray-700 mr-3"
                                     }`}
                                 >
-                                    {msg.role === "user" ? "U" : "AI"}
+                                    {msg.role === "user"
+                                        ? user
+                                            ? user.name[0]
+                                            : "U"
+                                        : "AI"}
                                 </div>
 
                                 <div
