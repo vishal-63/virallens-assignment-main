@@ -29,6 +29,7 @@
 -   Improved CORS configuration to properly support cross-origin cookies.
 -   Updated system prompt to enforce responses in English only.
 -   Refactored chat API to no longer depend on token headers.
+-   Replaced original background image to compressed webp format
 
 ### Removed
 
