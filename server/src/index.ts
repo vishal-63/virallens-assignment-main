@@ -8,22 +8,21 @@ import authRoutes from "./routes/auth";
 import chatRoutes from "./routes/chat";
 import { errorHandler } from "./middleware/errorHandler";
 import { generalLimiter } from "./middleware/rateLimiter";
-import { env } from "./config/env";
 
 dotenv.config();
 
 const app = express();
-const PORT = env.PORT;
+const PORT = process.env.PORT;
 
 connectDB();
 
 app.use(helmet());
-console.log("|----Frontend URL: ", env.FRONTEND_URL);
+console.log("|----Frontend URL: ", process.env.FRONTEND_URL);
 app.use(
-  cors({
-    origin: env.FRONTEND_URL,
-    credentials: true,
-  })
+    cors({
+        origin: process.env.FRONTEND_URL,
+        credentials: true,
+    })
 );
 
 app.use(cookieParser());
@@ -37,16 +36,16 @@ app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 
 app.get("/", (req, res) => {
-  res.json({
-    message: "Server is running!",
-    timestamp: new Date().toISOString(),
-  });
+    res.json({
+        message: "Server is running!",
+        timestamp: new Date().toISOString(),
+    });
 });
 
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
 
 export default app;
