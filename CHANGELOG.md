@@ -1,6 +1,16 @@
 # Changelog
 
-## [Unreleased]
+## [v1.0.1] - Authentication, AI, and Infrastructure Improvements
+
+### Deployed Links
+
+#### **Frontend**
+
+-   **URL:** _https://virallens-assignment-main.vercel.app/_
+
+#### **Backend**
+
+-   **URL:** _https://virallens-assignment-main-production.up.railway.app/_
 
 ### Added
 
