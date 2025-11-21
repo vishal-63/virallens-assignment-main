@@ -1,39 +1,52 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import connectDB from './config/database';
-import authRoutes from './routes/auth';
-import chatRoutes from './routes/chat';
-import { errorHandler } from './middleware/errorHandler';
-import { generalLimiter } from './middleware/rateLimiter';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import connectDB from "./config/database";
+import authRoutes from "./routes/auth";
+import chatRoutes from "./routes/chat";
+import { errorHandler } from "./middleware/errorHandler";
+import { generalLimiter } from "./middleware/rateLimiter";
+import { env } from "./config/env";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = env.PORT;
 
 connectDB();
 
-app.use(cors({
-    origin: ['http://www.google.com'],
-}));
+app.use(helmet());
+console.log("|----Frontend URL: ", env.FRONTEND_URL);
+app.use(
+  cors({
+    origin: env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
-app.use('/api/', generalLimiter);
+app.use(cookieParser());
+
+app.use("/api/", generalLimiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/auth-routes', authRoutes);
-app.use('/api/chat-routes', chatRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/chat", chatRoutes);
 
-app.get('/', (req, res) => {
-    res.json({ message: 'Server is running!', timestamp: new Date().toISOString() });
+app.get("/", (req, res) => {
+  res.json({
+    message: "Server is running!",
+    timestamp: new Date().toISOString(),
+  });
 });
 
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
 
 export default app;

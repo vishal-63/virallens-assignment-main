@@ -1,12 +1,12 @@
-import { rateLimit } from 'express-rate-limit';
+import { rateLimit } from "express-rate-limit";
 
 export const generalLimiter = rateLimit({
     windowMs: 2 * 60 * 1000, // 2 minutes for each user in the same IP ITS INTENTIONAL SO DON'T COUNT IT AS A BUG
-    max: 8,
+    max: 20,
     message: {
         success: false,
-        message: 'Too many requests from this IP, please try again later.',
-        retryAfter: 2 * 60
+        message: "Too many requests from this IP, please try again later.",
+        retryAfter: 2 * 60,
     },
     standardHeaders: true,
     legacyHeaders: false,
@@ -19,8 +19,9 @@ export const authLimiter = rateLimit({
     max: 10,
     message: {
         success: false,
-        message: 'Too many authentication attempts, please try again in 15 minutes.',
-        retryAfter: 15 * 60
+        message:
+            "Too many authentication attempts, please try again in 15 minutes.",
+        retryAfter: 15 * 60,
     },
     standardHeaders: true,
     legacyHeaders: false,
@@ -33,8 +34,8 @@ export const chatLimiter = rateLimit({
     max: 10,
     message: {
         success: false,
-        message: 'Too many messages sent, please slow down.',
-        retryAfter: 60
+        message: "Too many messages sent, please slow down.",
+        retryAfter: 60,
     },
     standardHeaders: true,
     legacyHeaders: false,
@@ -47,8 +48,9 @@ export const strictLimiter = rateLimit({
     max: 10,
     message: {
         success: false,
-        message: 'Rate limit exceeded for this operation. Please try again later.',
-        retryAfter: 60 * 60
+        message:
+            "Rate limit exceeded for this operation. Please try again later.",
+        retryAfter: 60 * 60,
     },
     standardHeaders: true,
     legacyHeaders: false,
@@ -61,8 +63,9 @@ export const createAccountLimiter = rateLimit({
     max: 3,
     message: {
         success: false,
-        message: 'Too many accounts created from this IP, please try again later.',
-        retryAfter: 60 * 60
+        message:
+            "Too many accounts created from this IP, please try again later.",
+        retryAfter: 60 * 60,
     },
     standardHeaders: true,
     legacyHeaders: false,
