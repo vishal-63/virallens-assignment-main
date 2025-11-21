@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface AuthLayoutProps {
     children: React.ReactNode;
@@ -12,8 +12,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     children,
     title,
     subtitle,
-    imageUrl = "/viral.jpg",
-    imageAlt = "Modern office workspace"
+    imageUrl = "/viral.webp",
+    imageAlt = "Modern office workspace",
 }) => {
     return (
         <div className="min-h-screen bg-gray-100 flex p-2">
@@ -23,9 +23,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                         <h2 className="text-3xl font-bold text-gray-900 mb-2">
                             {title}
                         </h2>
-                        <p className="text-gray-600 text-sm">
-                            {subtitle}
-                        </p>
+                        <p className="text-gray-600 text-sm">{subtitle}</p>
                     </div>
                     <div className="bg-white rounded-2xl border border-gray-200 p-8">
                         {children}
@@ -44,11 +42,14 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                     <div className="absolute inset-0 flex items-center justify-center p-12">
                         <div className="text-center text-white">
                             <h3 className="text-4xl font-bold mb-4 leading-tight">
-                                Welcome to the Future of Marketing with virallens
+                                Welcome to the Future of Marketing with
+                                virallens
                             </h3>
                             <p className="text-xl opacity-90 leading-relaxed">
-
-                                Performance marketing and AI video solutions built exclusively for school and college marketers.                            </p>
+                                Performance marketing and AI video solutions
+                                built exclusively for school and college
+                                marketers.{" "}
+                            </p>
                         </div>
                     </div>
                 </div>
