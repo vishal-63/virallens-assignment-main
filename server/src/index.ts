@@ -17,7 +17,7 @@ const PORT = process.env.PORT;
 connectDB();
 
 app.use(helmet());
-console.log("|----Frontend URL: ", process.env.FRONTEND_URL);
+console.log("Frontend URL: ", process.env.FRONTEND_URL);
 app.use(
     cors({
         origin: process.env.FRONTEND_URL,
