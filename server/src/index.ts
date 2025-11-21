@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/database";
 import authRoutes from "./routes/auth";
@@ -16,7 +15,6 @@ const PORT = process.env.PORT;
 
 connectDB();
 
-app.use(helmet());
 console.log("Frontend URL: ", process.env.FRONTEND_URL);
 
 app.set("trust proxy", 1);
