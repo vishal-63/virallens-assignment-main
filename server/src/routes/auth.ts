@@ -150,8 +150,8 @@ router.post(
 
             res.cookie("token", token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
+                secure: true,
+                sameSite: "none",
                 maxAge: 1000 * 60 * 60 * 24 * 7,
             });
             res.status(200).json({
