@@ -18,12 +18,19 @@ connectDB();
 
 app.use(helmet());
 console.log("Frontend URL: ", process.env.FRONTEND_URL);
+
+app.set("trust proxy", 1);
+
 app.use(
     cors({
         origin: process.env.FRONTEND_URL,
         credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
     })
 );
+
+app.options("*", cors());
 
 app.use(cookieParser());
 

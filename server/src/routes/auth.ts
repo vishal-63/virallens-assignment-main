@@ -210,8 +210,8 @@ router.post(
     (req: Request, res: Response): void => {
         res.clearCookie("token", {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            secure: true,
+            sameSite: "none",
         });
         res.json({
             success: true,
